@@ -50,7 +50,7 @@ function App() {
 const Home = ({ user }) => (
   <div>
     <h1>Welcome to Nexus AI</h1>
-    <p>{user ? `Welcome, ${user.email}! You are logged in.` : "You are not logged in."}</p>
+    <p>{user ? `${user.message}` : "You are not logged in."}</p>
   </div>
 );
 

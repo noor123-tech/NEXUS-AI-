@@ -16,17 +16,25 @@ const Navbar = ({ user, handleLogout }) => {
 
         {user ? (
           <>
-               {/* Show Dashboard link for logged-in users */}
             <Link to="/dashboard" style={styles.link}>Dashboard</Link>
 
             <div style={styles.userInfo}>
               {user.imageUrl ? (
-                <img src={user.imageUrl} alt="User" style={styles.profileImage} />
+                <img
+                  src={user.imageUrl}
+                  alt="User"
+                  style={styles.profileImage}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/40'; // fallback if broken image
+                  }}
+                />
               ) : (
                 <div style={{ ...styles.colorBall, backgroundColor: randomColor() }}></div>
               )}
-              <span style={styles.userName}>Welcome, {user.name}</span>
+              <span style={styles.userName}>{user.name}</span>
             </div>
+
             <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
           </>
         ) : (
@@ -80,25 +88,27 @@ const styles = {
     fontSize: "18px",
     cursor: "pointer",
   },
-  userName: {
-    color: "white",
-    fontSize: "18px",
-  },
   userInfo: {
     display: "flex",
     alignItems: "center",
+    gap: "10px",
   },
   profileImage: {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
-    marginRight: "10px",
+    objectFit: "cover",
+    backgroundColor: "white",
   },
   colorBall: {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
-    marginRight: "10px",
+    backgroundColor: "#ccc",
+  },
+  userName: {
+    color: "white",
+    fontSize: "18px",
   },
 };
 

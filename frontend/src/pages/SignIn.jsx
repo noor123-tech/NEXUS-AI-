@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+
 import axios from "axios";
 
 function SignIn() {
@@ -24,24 +26,24 @@ function SignIn() {
       alert('Invalid credentials');
     }
   };
+const handleGoogleLogin = (credentialResponse) => {
+  console.log(credentialResponse);
 
-  const handleGoogleLogin = (credentialResponse) => {
-    console.log(credentialResponse);
-    alert('Google login successful');
+  const decoded = jwtDecode(credentialResponse.credential); // ✅ correct
 
-    // Extract necessary data from the Google response
-    const googleUserData = {
-      email: credentialResponse?.profileObj?.email,
-      name: credentialResponse?.profileObj?.name,
-      imageUrl: credentialResponse?.profileObj?.imageUrl,
-    };
-
-    // Save Google user data in localStorage in the same format as manual login
-    localStorage.setItem('user', JSON.stringify({ message: `Welcome, ${googleUserData.email}` }));
-
-    // Redirect to homepage
-    window.location.href = '/';
+  const googleUserData = {
+    message: decoded.email,
+    name: decoded.name,
+    imageUrl: decoded.picture,
   };
+
+  alert('Google login successful');
+
+  // Save full google user data
+  localStorage.setItem('user', JSON.stringify(googleUserData));
+
+  window.location.href = '/';
+};
 
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
