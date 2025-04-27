@@ -16,6 +16,9 @@ const Navbar = ({ user, handleLogout }) => {
 
         {user ? (
           <>
+               {/* Show Dashboard link for logged-in users */}
+            <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+
             <div style={styles.userInfo}>
               {user.imageUrl ? (
                 <img src={user.imageUrl} alt="User" style={styles.profileImage} />

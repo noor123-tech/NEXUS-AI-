@@ -1,10 +1,10 @@
-import Navbar from './components/Navbar';
-import { useEffect, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from "react-router-dom";
 import PrivateRoute from './components/PrivateRoute';
+import Navbar from './components/Navbar';
 import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import { useState, useEffect } from 'react';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -14,7 +14,7 @@ function App() {
     // Check localStorage on load
     const userData = localStorage.getItem('user');
     if (userData) {
-      setUser(JSON.parse(userData));
+      setUser(JSON.parse(userData));  // Parse and set the user data
     }
   }, []);
 
@@ -32,11 +32,15 @@ function App() {
           <Route path="/" element={<Home user={user} />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={
-            <PrivateRoute user={user}>
-              <Dashboard />
-            </PrivateRoute>
-          } />
+
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute user={user}>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
     </>

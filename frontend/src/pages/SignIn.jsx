@@ -8,16 +8,14 @@ function SignIn() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post('http://127.0.0.1:8000/login', {
         email,
         password,
       });
-
       alert('Login successful!');
 
-      // Save user info in localStorage
+      // Save the complete user object in localStorage
       localStorage.setItem('user', JSON.stringify(response.data));
 
       // Redirect to homepage (optional)
@@ -38,8 +36,8 @@ function SignIn() {
       imageUrl: credentialResponse?.profileObj?.imageUrl,
     };
 
-    // Save Google user data in localStorage
-    localStorage.setItem('user', JSON.stringify(googleUserData));
+    // Save Google user data in localStorage in the same format as manual login
+    localStorage.setItem('user', JSON.stringify({ message: `Welcome, ${googleUserData.email}` }));
 
     // Redirect to homepage
     window.location.href = '/';
