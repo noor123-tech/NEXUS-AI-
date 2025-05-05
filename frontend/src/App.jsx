@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ForgotPassword from './pages/ForgotPassword';
+
 import { useState, useEffect } from 'react';
 
 function App() {
@@ -32,6 +34,7 @@ function App() {
           <Route path="/" element={<Home user={user} />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
+<Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route
             path="/dashboard"
