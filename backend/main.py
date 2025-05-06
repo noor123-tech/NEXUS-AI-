@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
 import models, schemas, auth
 from database import SessionLocal, engine
@@ -47,8 +48,9 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if not db_user or not auth.verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    return {"message": f"Welcome, {db_user.email}"}
 
+    token = auth.create_access_token(data={"sub": db_user.email})
+    return JSONResponse(content={"access_token": token, "message": f"Welcome, {db_user.email}", "email": db_user.email})
 # Forgot Password schema
 class ForgotPasswordRequest(BaseModel):
     email: str

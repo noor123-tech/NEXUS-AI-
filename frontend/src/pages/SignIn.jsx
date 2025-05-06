@@ -20,9 +20,13 @@ function SignIn() {
         email,
         password,
       });
-
+      const userData = {
+        message: response.data.message,
+        token: response.data.access_token,
+        email: response.data.email,
+      };
       alert('Login successful!');
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('user', JSON.stringify(userData));
       window.location.href = '/';
     } catch (error) {
       setError('Invalid credentials');
