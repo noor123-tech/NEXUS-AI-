@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Dependency to get DB session
 def get_db():
     db = SessionLocal()
@@ -29,28 +30,44 @@ def get_db():
     finally:
         db.close()
 
+
 # Register endpoint
 @app.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+
     hashed_password = auth.get_password_hash(user.password)
-    new_user = models.User(email=user.email, hashed_password=hashed_password)
+    new_user = models.User(email=user.email, hashed_password=hashed_password, name=user.name)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return {"message": "User created successfully"}
 
+
+# Login endpoint
 # Login endpoint
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
+
+    # Check if the user exists and if the password is correct
     if not db_user or not auth.verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
+    # Create access token
     token = auth.create_access_token(data={"sub": db_user.email})
-    return JSONResponse(content={"access_token": token, "message": f"Welcome, {db_user.email}", "email": db_user.email})
+
+    # Return response with user's name
+    return JSONResponse(content={
+        "access_token": token,
+        "message": f"Welcome, {db_user.name}",  # Include the user's name here
+        "email": db_user.email,
+        "name": db_user.name  # Include name in the response
+    })
+
+
 # Forgot Password schema
 class ForgotPasswordRequest(BaseModel):
     email: str
@@ -58,6 +75,7 @@ class ForgotPasswordRequest(BaseModel):
 
     class Config:
         from_attributes = True  # Updated for Pydantic v2
+
 
 # Forgot Password endpoint
 @app.post("/forgot-password")

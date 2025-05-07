@@ -19,9 +19,11 @@ function SignIn() {
       const response = await axios.post('http://127.0.0.1:8000/login', {
         email,
         password,
+  
       });
       const userData = {
         message: response.data.message,
+        name: response.data.name,  // ✅ Comes from FastAPI login response
         token: response.data.access_token,
         email: response.data.email,
       };

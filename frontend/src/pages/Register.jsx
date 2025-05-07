@@ -1,28 +1,29 @@
 import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import '../App';
+import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://127.0.0.1:8000/register', {
+        name,
         email,
         password,
       });
-      console.log(response.data);
       alert('Registration successful! Please login.');
       navigate('/signin');
     } catch (error) {
       console.error(error);
-      alert('Registration failed. Maybe user already exists.');
+      setError('Registration failed. Maybe user already exists.');
     }
   };
 
@@ -46,18 +47,18 @@ function Register() {
       height: '100vh',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     }}>
       <div style={{
         backgroundColor: '#fff',
         padding: '40px',
         borderRadius: '10px',
         width: '400px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
       }}>
         <div style={{
           textAlign: 'center',
-          marginBottom: '20px',
+          marginBottom: '20px'
         }}>
           <div style={{
             width: '40px',
@@ -67,16 +68,16 @@ function Register() {
             border: '2px solid #ccc',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'center'
           }}>
             <div style={{
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              backgroundColor: '#000',
+              backgroundColor: '#000'
             }}></div>
           </div>
-          <h2 style={{ margin: '10px 0 5px' }}>Sign up Nexus AI</h2>
+          <h2 style={{ margin: '10px 0 5px' }}>Sign up</h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
             We just need a few details to get you started.
           </p>
@@ -84,19 +85,37 @@ function Register() {
 
         <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div>
-            <label style={{ display: 'block', fontWeight: 'bold', fontSize: '14px', marginBottom: '5px' }}>Email</label>
+            <label style={{ display: 'block', fontWeight: 'bold', fontSize: '14px', marginBottom: '5px' }}>Name</label>
             <input
-              type="email"
-              placeholder="hi@yourcompany.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Your Name"
+              value={name}
+              onChange={e => setName(e.target.value)}
               required
               style={{
                 width: '100%',
                 padding: '10px',
                 borderRadius: '6px',
                 border: '1px solid #ccc',
-                fontSize: '14px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontWeight: 'bold', fontSize: '14px', marginBottom: '5px' }}>Email</label>
+            <input
+              type="email"
+              placeholder="hi@yourcompany.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                fontSize: '14px'
               }}
             />
           </div>
@@ -107,14 +126,14 @@ function Register() {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
               style={{
                 width: '100%',
                 padding: '10px',
                 borderRadius: '6px',
                 border: '1px solid #ccc',
-                fontSize: '14px',
+                fontSize: '14px'
               }}
             />
           </div>
@@ -126,33 +145,36 @@ function Register() {
             borderRadius: '6px',
             border: 'none',
             cursor: 'pointer',
-            fontWeight: 'bold',
+            fontWeight: 'bold'
           }}>
             Sign up
           </button>
-          <hr style={{ margin: '20px 0' }} />
-
-          <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            onError={() => {
-              alert('Google login failed');
-            }}
-            useOneTap
-            style={{
-              padding: '10px',
-              backgroundColor: '#4285F4',
-              color: '#fff',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              width: '100%',
-              textAlign: 'center',
-            }}
-          >
-            Continue with Google
-          </GoogleLogin>
         </form>
 
-        <p style={{ textAlign: 'center', fontSize: '14px', marginTop: '15px' }}>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <hr style={{ margin: '20px 0' }} />
+
+        <GoogleLogin
+          onSuccess={handleGoogleLogin}
+          onError={() => {
+            alert('Google login failed');
+          }}
+          useOneTap
+          style={{
+            padding: '10px',
+            backgroundColor: '#4285F4',
+            color: '#fff',
+            borderRadius: '6px',
+            fontWeight: 'bold',
+            width: '100%',
+            textAlign: 'center'
+          }}
+        >
+          Continue with Google
+        </GoogleLogin>
+
+        <p style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '20px' }}>
           Already have an account? <Link to="/signin">Click here to Login</Link>
         </p>
 

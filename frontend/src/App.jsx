@@ -50,11 +50,14 @@ function App() {
   );
 }
 
-const Home = ({ user }) => (
-  <div>
-    <h1>Welcome to Nexus AI</h1>
-    <p>{user ? `${user.message}` : "You are not logged in."}</p>
-  </div>
-);
+
+  const Home = ({ user }) => (
+    <div>
+      <h1>Welcome to Nexus AI</h1>
+      <p>{user ? `Hello, ${user.name || user.email}` : "You are not logged in."}</p>
+    </div>
+  );
+  
+
 
 export default App;

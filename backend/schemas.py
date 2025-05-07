@@ -1,13 +1,9 @@
 from pydantic import BaseModel
 
-
-class ForgotPasswordRequest(BaseModel):
-    email: str
-    new_password: str
-
 class UserCreate(BaseModel):
     email: str
     password: str
+    name: str  # New field
 
 class UserLogin(BaseModel):
     email: str
@@ -16,6 +12,7 @@ class UserLogin(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: str
+    name: str  # Include name in the output
 
     class Config:
-        from_attributes = True  # Change orm_mode to from_attributes
+        from_attributes = True
