@@ -5,8 +5,8 @@ import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgotPassword';
-
 import { useState, useEffect } from 'react';
+import './index.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,7 +29,7 @@ function App() {
   return (
     <>
       <Navbar user={user} handleLogout={handleLogout} />
-      <div style={{ padding: '20px' }}>
+      <div style={{ }}>
         <Routes>
           <Route path="/" element={<Home user={user} />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
