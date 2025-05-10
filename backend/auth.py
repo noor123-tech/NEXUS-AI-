@@ -33,4 +33,16 @@ def decode_access_token(token: str):
         return None
     except jwt.PyJWTError:
         return None
+# for email verifcation authentication and how it works 
+def create_email_verification_token(email: str):
+    expire = datetime.utcnow() + timedelta(hours=1)
+    to_encode = {"sub": email, "exp": expire}
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_email_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload["sub"]
+    except jwt.JWTError:
+        return None
 
