@@ -8,9 +8,12 @@ import models, schemas, auth
 from database import SessionLocal, engine
 # for smtp
 from pydantic import BaseModel, EmailStr
+from fastapi import Header
+
 from email_utils import send_email
 from auth import create_email_verification_token  # You'll add this
-
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -165,8 +168,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 # Forgot Password schema
 class ForgotPasswordRequest(BaseModel):
-    email: str
-    new_password: str
+    email: EmailStr
 
     class Config:
         from_attributes = True  # Updated for Pydantic v2
@@ -179,14 +181,88 @@ def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    token = auth.create_email_verification_token(user.email)
+    reset_link = f"http://localhost:5173/reset-password?token={token}"
+
+    subject = "Reset Your Password - Nexus AI"
+    body = f"""
+    Hi {user.name},
+
+    You requested to reset your password.
+
+    Click the link below to reset it (valid for 15 minutes):
+    {reset_link}
+
+    If you didn't request this, please ignore the email.
+
+    Thanks,
+    Nexus AI Team
+    """
+    result = send_email(to_email=user.email, subject=subject, body=body)
+
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=f"Email sending failed: {result['error']}")
+
+    return {"message": "Password reset link sent to your email."}
+    # forgot password endpoint ends here
+# reset password endpoint starts from here
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+@app.post("/reset-password")
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    email = auth.verify_email_token(data.token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid or expired token.")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
     user.hashed_password = auth.get_password_hash(data.new_password)
     db.commit()
-    return {"msg": "Password updated successfully"}
+
+    return {"message": "Password reset successful. Please log in with your new password."}
 
 
-    # forgot password endpoint ends here
+# reset password endpoint ends here 
+# change password endpoint starts from here
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+@app.post("/change-password")
+def change_password(
+    data: ChangePasswordRequest,
+    authorization: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
 
+    token = authorization.replace("Bearer ", "")
+    payload = auth.decode_access_token(token)
+
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    email = payload.get("sub")
+    if not email:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not auth.verify_password(data.current_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+
+    user.hashed_password = auth.get_password_hash(data.new_password)
+    db.commit()
+
+    return {"message": "Password changed successfully"}
+# change password endpoint ends here
 class EmailTestRequest(BaseModel):
     to_email: EmailStr
     subject: str

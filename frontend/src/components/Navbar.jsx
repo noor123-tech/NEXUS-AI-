@@ -34,6 +34,7 @@ const Navbar = ({ user, handleLogout }) => {
               )}
               <span style={styles.userName}>{user.name}</span>
             </div>
+            <Link to="/change-password">Change Password</Link> {/* ✅ Add this */}
 
             <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
           </>

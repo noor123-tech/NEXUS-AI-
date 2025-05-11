@@ -3,26 +3,25 @@ import { useNavigate } from "react-router-dom"; // Make sure to import useNaviga
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // Initialize navigate here
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await fetch("http://localhost:8000/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, new_password: newPassword }),
+      body: JSON.stringify({ email })
     });
 
     const data = await res.json();
     if (res.ok) {
-      setMessage("Password updated. Try logging in again.");
+      setMessage("Please check your email. We have sent a reset link.");
       setTimeout(() => {
-        navigate('/signin'); // Redirect to the login page after 2 seconds
-      }, 2000);
+        navigate('/signin');
+      }, 3000);
     } else {
-      setMessage(data.detail || "Failed to reset password.");
+      setMessage("Failed to send reset email. Please try again.");
     }
   };
 
@@ -87,7 +86,7 @@ const ForgotPassword = () => {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label style={{ display: 'block', fontWeight: 'bold', fontSize: '14px', marginBottom: '5px' }}>New Password</label>
             <input
               type="password"
@@ -103,7 +102,7 @@ const ForgotPassword = () => {
                 fontSize: '14px',
               }}
             />
-          </div>
+          </div> */}
 
           <button type="submit" style={{
             padding: '10px',
