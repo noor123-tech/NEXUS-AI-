@@ -63,7 +63,7 @@ const ForgotPassword = () => {
           </div>
           <h2 style={{ margin: '10px 0 5px' }}>Forgot Password</h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
-            Enter your email and new password.
+Enter your email below, and we'll send you a link to reset your password.
           </p>
         </div>
 

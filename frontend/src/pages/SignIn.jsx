@@ -144,9 +144,9 @@ function SignIn() {
   }}
   className="change-password"
 >
-  <Link to="/change-password" style={{ color: '#007bff', textDecoration: 'underline', fontSize: '14px' }}>
+  {/* <Link to="/change-password" style={{ color: '#007bff', textDecoration: 'underline', fontSize: '14px' }}>
     Change password
-  </Link>
+  </Link> */}
 </div>
           <button type="submit" style={{
             padding: '10px',

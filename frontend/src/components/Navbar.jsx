@@ -6,6 +6,18 @@ const Navbar = ({ user, handleLogout }) => {
     const colors = ['bg-red-500', 'bg-green-500', 'bg-blue-500', 'bg-pink-500'];
     return colors[Math.floor(Math.random() * colors.length)];
   };
+    const styles = {
+    logoutButton: {
+      backgroundColor: '#f87171', // Red-500
+      padding: '8px 16px',
+      borderRadius: '8px',
+      fontWeight: 'bold',
+      color: '#fff',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'background-color 0.2s'
+    }
+  };
 
   return (
     <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
