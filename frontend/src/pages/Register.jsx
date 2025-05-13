@@ -19,7 +19,7 @@ function Register() {
         email,
         password,
       });
-      alert('Registration successful! Please login.');
+      alert('Registration successful! Please verify your email before logging in.');
       navigate('/signin');
     } catch (error) {
       console.error(error);

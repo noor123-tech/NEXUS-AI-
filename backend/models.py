@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, Boolean , String
 from database import Base
 
 class User(Base):
@@ -9,3 +9,4 @@ class User(Base):
     hashed_password = Column(String)
     name = Column(String, nullable=True)  # New name field
     google_id = Column(String, nullable=True)
+    is_verified = Column(Boolean, default=False)  # ✅ Add this line

@@ -1,9 +1,10 @@
+import React from "react";
 import { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import React from "react";
+import ChangePassword from "../components/ChangePassword";
 
 function SignIn() {
   const [email, setEmail] = useState('');
@@ -22,17 +23,22 @@ function SignIn() {
         password,
   
       });
+      if (response.status === 403) {
+        setError(response.data.detail);
+        return;
+      }
       const userData = {
         message: response.data.message,
         name: response.data.name,  // ✅ Comes from FastAPI login response
         token: response.data.access_token,
         email: response.data.email,
       };
+      console.log("✅ JWT received:", response.data.access_token);
       alert('Login successful!');
       localStorage.setItem('user', JSON.stringify(userData));
       window.location.href = '/';
     } catch (error) {
-      setError('Invalid credentials');
+      setError(error.response?.data?.detail || 'Invalid credentials');
       setShowForgot(true);
     }
   };
@@ -130,7 +136,18 @@ function SignIn() {
               }}
             />
           </div>
-
+          <div
+  style={{
+    display: 'flex',
+    justifyContent: 'left',
+    marginTop: '10px'
+  }}
+  className="change-password"
+>
+  <Link to="/change-password" style={{ color: '#007bff', textDecoration: 'underline', fontSize: '14px' }}>
+    Change password
+  </Link>
+</div>
           <button type="submit" style={{
             padding: '10px',
             backgroundColor: '#000',

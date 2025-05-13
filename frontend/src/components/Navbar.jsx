@@ -38,12 +38,12 @@ const Navbar = ({ user, handleLogout }) => {
               )}
               <span className="text-sm font-medium">{user.name}</span>
             </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
-            >
-              Logout
-            </button>
+
+        
+            <Link to="/change-password">Change Password</Link> {/* ✅ Add this */}
+
+            <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
+
           </>
         ) : (
           <>

@@ -5,13 +5,17 @@ import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgotPassword';
+import ChangePassword from "./components/ChangePassword";
 import { useState, useEffect } from 'react';
 import './index.css';
+
 import Home from "./pages/Home";
 import React from "react";
 import ContactUs from "./pages/ContactUs";
 import FAQ from "./pages/FAQ";
 import PostBlog from "./pages/PostBlog";
+
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,9 +43,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact-us" element={<ContactUs />} />
+
+
+<Route path="reset-password" element={<ResetPassword/>} />
 
           <Route
             path="/dashboard"
@@ -51,6 +59,7 @@ function App() {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/post-blog"
             element={
@@ -59,6 +68,17 @@ function App() {
               </PrivateRoute>
             }
           />
+
+           {/* ✅ ChangePassword Route */}
+           <Route
+            path="/change-password"
+            element={
+              <PrivateRoute user={user}>
+                <ChangePassword />
+              </PrivateRoute>
+            }
+            />
+
         </Routes>
       </div>
     </>
