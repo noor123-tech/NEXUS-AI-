@@ -1,116 +1,69 @@
 import { Link } from 'react-router-dom';
+import React from 'react';
 
 const Navbar = ({ user, handleLogout }) => {
   const randomColor = () => {
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A5'];
+    const colors = ['bg-red-500', 'bg-green-500', 'bg-blue-500', 'bg-pink-500'];
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
   return (
-    <nav style={styles.navbar}>
-      <div style={styles.logo}>Nexus AI</div>
-      <div style={styles.links}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/contact" style={styles.link}>Contact Us</Link>
-        <Link to="/faq" style={styles.link}>FAQ</Link>
+    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
+      {/* Logo */}
+      <div className="text-2xl font-bold">Nexus AI</div>
+
+      {/* Links */}
+      <div className="flex gap-6 items-center">
+        <Link to="/" className="hover:text-sky-400 transition">Home</Link>
+        <Link to="/contact-us" className="hover:text-sky-400 transition">Contact Us</Link>
+        <Link to="/faq" className="hover:text-sky-400 transition">FAQ</Link>
 
         {user ? (
           <>
-            <Link to="/dashboard" style={styles.link}>Dashboard</Link>
-
-            <div style={styles.userInfo}>
+            <Link to="/dashboard" className="hover:text-sky-400 transition">Dashboard</Link>
+            <Link to="/post-blog" className="hover:text-sky-400 transition">Post Blog</Link>
+            <div className="flex items-center gap-3">
               {user.imageUrl ? (
                 <img
                   src={user.imageUrl}
                   alt="User"
-                  style={styles.profileImage}
+                  className="w-10 h-10 rounded-full object-cover bg-white"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/40'; // fallback if broken image
+                    e.target.src = 'https://via.placeholder.com/40';
                   }}
                 />
               ) : (
-                <div style={{ ...styles.colorBall, backgroundColor: randomColor() }}></div>
+                <div className={`w-10 h-10 rounded-full ${randomColor()}`}></div>
               )}
-              <span style={styles.userName}>{user.name}</span>
+              <span className="text-sm font-medium">{user.name}</span>
             </div>
+
+        
             <Link to="/change-password">Change Password</Link> {/* ✅ Add this */}
 
             <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
+
           </>
         ) : (
           <>
-            <Link to="/signin" style={styles.button}>Sign In</Link>
-            <Link to="/register" style={styles.button}>Register</Link>
+            <Link
+              to="/signin"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/register"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm"
+            >
+              Register
+            </Link>
           </>
         )}
       </div>
     </nav>
   );
-};
-
-const styles = {
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#333",
-    padding: "10px 20px",
-    color: "white",
-  },
-  logo: {
-    fontSize: "24px",
-    fontWeight: "bold",
-  },
-  links: {
-    display: "flex",
-    gap: "15px",
-    alignItems: "center",
-  },
-  link: {
-    color: "white",
-    textDecoration: "none",
-    fontSize: "18px",
-  },
-  button: {
-    backgroundColor: "#007BFF",
-    color: "white",
-    padding: "6px 12px",
-    borderRadius: "5px",
-    textDecoration: "none",
-    fontSize: "18px",
-  },
-  logoutButton: {
-    backgroundColor: "#dc3545",
-    color: "white",
-    padding: "6px 12px",
-    borderRadius: "5px",
-    border: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-  },
-  userInfo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  profileImage: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    backgroundColor: "white",
-  },
-  colorBall: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    backgroundColor: "#ccc",
-  },
-  userName: {
-    color: "white",
-    fontSize: "18px",
-  },
 };
 
 export default Navbar;

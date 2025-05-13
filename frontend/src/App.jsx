@@ -8,6 +8,13 @@ import ForgotPassword from './pages/ForgotPassword';
 import ChangePassword from "./components/ChangePassword";
 import { useState, useEffect } from 'react';
 import './index.css';
+
+import Home from "./pages/Home";
+import React from "react";
+import ContactUs from "./pages/ContactUs";
+import FAQ from "./pages/FAQ";
+import PostBlog from "./pages/PostBlog";
+
 import ResetPassword from "./pages/ResetPassword";
 
 function App() {
@@ -33,11 +40,17 @@ function App() {
       <Navbar user={user} handleLogout={handleLogout} />
       <div style={{ }}>
         <Routes>
-          <Route path="/" element={<Home user={user} />} />
+          <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
-<Route path="/forgot-password" element={<ForgotPassword />} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+
+
 <Route path="reset-password" element={<ResetPassword/>} />
+
           <Route
             path="/dashboard"
             element={
@@ -46,6 +59,16 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          <Route
+            path="/post-blog"
+            element={
+              <PrivateRoute user={user}>
+                <PostBlog />
+              </PrivateRoute>
+            }
+          />
+
            {/* ✅ ChangePassword Route */}
            <Route
             path="/change-password"
@@ -55,20 +78,11 @@ function App() {
               </PrivateRoute>
             }
             />
+
         </Routes>
       </div>
     </>
   );
 }
-
-
-  const Home = ({ user }) => (
-    <div>
-      <h1>Welcome to Nexus AI</h1>
-      <p>{user ? `Hello, ${user.name || user.email}` : "You are not logged in."}</p>
-    </div>
-  );
-  
-
 
 export default App;

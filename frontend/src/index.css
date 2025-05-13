@@ -1,9 +1,1 @@
 @import "tailwindcss";
-@tailwind components;
-@tailwind utilities;
-
-
-
-body{
-  background-color: white
-}
