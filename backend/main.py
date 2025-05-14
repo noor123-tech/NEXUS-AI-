@@ -9,7 +9,14 @@ from database import SessionLocal, engine
 # for smtp
 from pydantic import BaseModel, EmailStr
 from fastapi import Header
+# import for AI MODEL
+import os
+import re
+from dotenv import load_dotenv
+import google.generativeai as genai
+from fastapi import Form
 
+# imports end here
 from email_utils import send_email
 from auth import create_email_verification_token  # You'll add this
 from fastapi.security import OAuth2PasswordBearer
@@ -276,3 +283,40 @@ def test_email(request: EmailTestRequest):
         body=request.body
     )
     return result
+
+
+
+    # for AI MODEL CODE : 
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY not found in environment variables!")
+
+# Configure Gemini
+genai.configure(api_key=API_KEY)
+
+# Format the response text
+def format_response(text):
+    text = re.sub(r"\*\*([^\*]+)\*\*", r"\n\1:", text)
+    text = text.replace("* ", "\n")
+    text = re.sub(r"\n+", "\n\n", text)
+    return text.strip()
+
+
+
+@app.post("/api/chat")
+async def chat_api(message: str = Form(...)):
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(message)
+        formatted_response = format_response(response.text)
+        return JSONResponse(content={"response": formatted_response})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+
+
+
+    # AI model code ends here
