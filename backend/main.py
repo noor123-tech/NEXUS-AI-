@@ -106,7 +106,8 @@ def register(user: schemas.UserCreate, request: Request, db: Session = Depends(g
 
     # ✅ Generate verification token
     token = create_email_verification_token(user.email)
-    verify_link = f"http://localhost:8000/verify-email?token={token}"
+    # verify_link = f"http://localhost:8000/verify-email?token={token}"
+    verify_link = f"http://localhost:5173/email-verified?token={token}"
 
     # ✅ Send verification email
     subject = "Verify Your Email - Nexus AI"
@@ -130,24 +131,65 @@ def register(user: schemas.UserCreate, request: Request, db: Session = Depends(g
 
 # registration code is going to end here 
 # verify email start from here
+# @app.get("/verify-email")
+# def verify_email(token: str, db: Session = Depends(get_db)):
+#     email = auth.verify_email_token(token)
+#     if not email:
+#         raise HTTPException(status_code=400, detail="Invalid or expired token.")
+
+#     user = db.query(models.User).filter(models.User.email == email).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+
+#     if user.is_verified:
+#         return {"message": "Account already verified."}
+
+#     user.is_verified = True
+#     db.commit()
+#     return {"message": "Email verified successfully. You can now log in."}
+
+# verify email ends here
+# @app.get("/verify-email")
+# def verify_email(token: str, db: Session = Depends(get_db)):
+#     email = auth.verify_email_token(token)
+#     if not email:
+#         return JSONResponse(status_code=400, content={"message": "Invalid or expired token"})
+
+#     user = db.query(models.User).filter(models.User.email == email).first()
+#     if not user:
+#         return JSONResponse(status_code=404, content={"message": "User not found"})
+
+#     if user.is_verified:
+#         return JSONResponse(status_code=200, content={"message": "Email already verified"})
+
+#     user.is_verified = True
+#     db.commit()
+#     return JSONResponse(status_code=200, content={"message": "Email verified successfully"})
 @app.get("/verify-email")
 def verify_email(token: str, db: Session = Depends(get_db)):
     email = auth.verify_email_token(token)
     if not email:
-        raise HTTPException(status_code=400, detail="Invalid or expired token.")
+        return JSONResponse(
+            content={"message": "Invalid or expired verification link."},
+            status_code=400
+        )
 
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return JSONResponse(
+            content={"message": "User not found."},
+            status_code=404
+        )
 
-    if user.is_verified:
-        return {"message": "Account already verified."}
-
+    # ✅ Even if user.is_verified == True, just return "success" to keep UI consistent
     user.is_verified = True
     db.commit()
-    return {"message": "Email verified successfully. You can now log in."}
 
-# verify email ends here
+    return JSONResponse(
+        content={"message": "Your email has been successfully verified."},
+        status_code=200
+    )
+
 # Login endpoint
 # Login endpoint
 @app.post("/login")
@@ -286,37 +328,100 @@ def test_email(request: EmailTestRequest):
 
 
 
-    # for AI MODEL CODE : 
-load_dotenv()
-API_KEY = os.getenv("GEMINI_API_KEY")
+#     # for AI MODEL CODE : 
+# load_dotenv()
+# API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY not found in environment variables!")
+# if not API_KEY:
+#     raise ValueError("GEMINI_API_KEY not found in environment variables!")
 
-# Configure Gemini
-genai.configure(api_key=API_KEY)
+# # Configure Gemini
+# genai.configure(api_key=API_KEY)
 
-# Format the response text
-def format_response(text):
-    text = re.sub(r"\*\*([^\*]+)\*\*", r"\n\1:", text)
-    text = text.replace("* ", "\n")
-    text = re.sub(r"\n+", "\n\n", text)
-    return text.strip()
+# # Format the response text
+# def format_response(text):
+#     text = re.sub(r"\*\*([^\*]+)\*\*", r"\n\1:", text)
+#     text = text.replace("* ", "\n")
+#     text = re.sub(r"\n+", "\n\n", text)
+#     return text.strip()
 
 
 
-@app.post("/api/chat")
-async def chat_api(message: str = Form(...)):
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(message)
-        formatted_response = format_response(response.text)
-        return JSONResponse(content={"response": formatted_response})
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+# @app.post("/api/chat")
+# async def chat_api(message: str = Form(...)):
+#     try:
+#         model = genai.GenerativeModel("gemini-1.5-flash")
+#         response = model.generate_content(message)
+#         formatted_response = format_response(response.text)
+#         return JSONResponse(content={"response": formatted_response})
+#     except Exception as e:
+#         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 
 
 
     # AI model code ends here
+    # ai model code for blogs starts here
+
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY not found in environment variables!")
+
+genai.configure(api_key=API_KEY)
+
+# Define simple friendly gestures
+friendly_gestures = {"hi", "hello", "hey", "thanks", "thank you", "good job", "nice work"}
+
+# Format the Gemini response
+def format_response(text):
+    text = re.sub(r"\*\*([^\*]+)\*\*", r"\n\1:", text)
+    text = text.replace("* ", "\n")
+    text = re.sub(r"\n+", "\n\n", text)
+    return text.strip()
+
+# Check if message is related to blog writing or reviewing
+def is_blog_related(message: str) -> bool:
+    blog_keywords = [
+        "write a blog", "blog on", "create a blog", "make a blog",
+        "can you write a blog", "post this blog", "is this blog good",
+        "review this blog", "check my blog", "improve my blog"
+    ]
+    message_lower = message.lower()
+    return any(kw in message_lower for kw in blog_keywords)
+
+# Check if the user provided an actual blog text (basic length heuristic)
+def seems_like_a_blog(text: str) -> bool:
+    # A simple check: treat it as a blog if it has at least 50 words
+    return len(text.split()) > 50
+
+@app.post("/api/chat")
+async def chat_api(message: str = Form(...)):
+    try:
+        msg_lower = message.lower().strip()
+
+        # Friendly replies
+        if msg_lower in friendly_gestures:
+            return JSONResponse(content={"response": "Hello! I'm here to help you with blogs. 😊"})
+
+        # Check if it's a blog-related request
+        if is_blog_related(msg_lower):
+            # If it's a review request, check for actual blog content
+            if "review" in msg_lower or "check" in msg_lower or "is this blog" in msg_lower:
+                if not seems_like_a_blog(message):
+                    return JSONResponse(content={"response": "❗ It seems you haven't provided a full blog. Please paste your blog so I can review it."})
+            # Allow writing/reviewing the blog
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content(message)
+            formatted_response = format_response(response.text)
+            return JSONResponse(content={"response": formatted_response})
+
+        # Reject all other types of input
+        return JSONResponse(content={"response": "❗ I'm here to help only with blog writing and reviewing. Please ask me to write or check a blog."})
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+    # ai model code for blogs end here

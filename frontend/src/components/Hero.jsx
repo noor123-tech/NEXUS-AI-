@@ -1,5 +1,7 @@
 import React from "react"
 import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
+import { Link } from 'react-router-dom';
 
 function FloatingPaths({ position }) {
   const paths = Array.from({ length: 36 }, (_, i) => ({
@@ -99,7 +101,9 @@ export default function BackgroundPaths({ title = "Background Paths" }) {
                             group-hover:-translate-y-0.5 border border-black/10 dark:border-white/10
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
             >
+              <Link to="/AI">
               <span className="opacity-90 group-hover:opacity-100 transition-opacity">Discover Excellence</span>
+              </Link>
               <span
                 className="ml-3 opacity-70 group-hover:opacity-100 group-hover:translate-x-1.5 
                                 transition-all duration-300"

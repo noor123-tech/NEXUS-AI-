@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -11,19 +10,24 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // 👈 Add loading state
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
+    setError('');
     try {
       const response = await axios.post('http://127.0.0.1:8000/register', {
         name,
         email,
         password,
       });
+      setLoading(false); // Stop loading
       alert('Registration successful! Please verify your email before logging in.');
       navigate('/signin');
     } catch (error) {
       console.error(error);
+      setLoading(false); // Stop loading on error too
       setError('Registration failed. Maybe user already exists.');
     }
   };
@@ -139,20 +143,20 @@ function Register() {
             />
           </div>
 
-          <button type="submit" style={{
+          <button type="submit" disabled={loading} style={{
             padding: '10px',
-            backgroundColor: '#000',
+            backgroundColor: loading ? '#888' : '#000',
             color: '#fff',
             borderRadius: '6px',
             border: 'none',
-            cursor: 'pointer',
+            cursor: loading ? 'not-allowed' : 'pointer',
             fontWeight: 'bold'
           }}>
-            Sign up
+            {loading ? 'Registering...' : 'Sign up'}
           </button>
         </form>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
 
         <hr style={{ margin: '20px 0' }} />
 
@@ -162,18 +166,7 @@ function Register() {
             alert('Google login failed');
           }}
           useOneTap
-          style={{
-            padding: '10px',
-            backgroundColor: '#4285F4',
-            color: '#fff',
-            borderRadius: '6px',
-            fontWeight: 'bold',
-            width: '100%',
-            textAlign: 'center'
-          }}
-        >
-          Continue with Google
-        </GoogleLogin>
+        />
 
         <p style={{ textAlign: 'center', fontSize: '12px', color: '#999', marginTop: '20px' }}>
           Already have an account? <Link to="/signin">Click here to Login</Link>

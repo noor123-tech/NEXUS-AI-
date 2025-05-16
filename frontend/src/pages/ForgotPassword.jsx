@@ -1,27 +1,36 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Make sure to import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:8000/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      setMessage("Please check your email. We have sent a reset link.");
-      setTimeout(() => {
-        navigate('/signin');
-      }, 3000);
-    } else {
-      setMessage("Failed to send reset email. Please try again.");
+      const data = await res.json();
+      setLoading(false);
+
+      if (res.ok) {
+        setMessage("Please check your email. We have sent a reset link.");
+        setTimeout(() => {
+          navigate('/signin');
+        }, 3000);
+      } else {
+        setMessage("Failed to send reset email. Please try again.");
+      }
+    } catch (err) {
+      setLoading(false);
+      setMessage("Something went wrong. Please try again.");
     }
   };
 
@@ -63,7 +72,7 @@ const ForgotPassword = () => {
           </div>
           <h2 style={{ margin: '10px 0 5px' }}>Forgot Password</h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
-Enter your email below, and we'll send you a link to reset your password.
+            Enter your email below, and we'll send you a link to reset your password.
           </p>
         </div>
 
@@ -86,40 +95,26 @@ Enter your email below, and we'll send you a link to reset your password.
             />
           </div>
 
-          {/* <div>
-            <label style={{ display: 'block', fontWeight: 'bold', fontSize: '14px', marginBottom: '5px' }}>New Password</label>
-            <input
-              type="password"
-              placeholder="Enter your new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '6px',
-                border: '1px solid #ccc',
-                fontSize: '14px',
-              }}
-            />
-          </div> */}
-
-          <button type="submit" style={{
-            padding: '10px',
-            backgroundColor: '#000',
-            color: '#fff',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}>
-            Reset Password
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: '10px',
+              backgroundColor: '#000',
+              color: '#fff',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            {loading ? 'Sending...' : 'Reset Password'}
           </button>
 
           {message && (
             <p style={{
               textAlign: 'center',
-              color: message.includes('Failed') ? 'red' : 'green',
+              color: message.includes('Failed') || message.includes('wrong') ? 'red' : 'green',
               fontSize: '14px',
               marginTop: '15px',
             }}>

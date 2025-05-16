@@ -8,13 +8,13 @@ import ForgotPassword from './pages/ForgotPassword';
 import ChangePassword from "./components/ChangePassword";
 import { useState, useEffect } from 'react';
 import './index.css';
-
+import AI from "./pages/AI";
 import Home from "./pages/Home";
 import React from "react";
 import ContactUs from "./pages/ContactUs";
 import FAQ from "./pages/FAQ";
 import PostBlog from "./pages/PostBlog";
-
+import EmailVerified from "./pages/EmailVerified";
 import ResetPassword from "./pages/ResetPassword";
 
 function App() {
@@ -47,7 +47,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact-us" element={<ContactUs />} />
-
+       <Route path="/email-verified" element={<EmailVerified/>} />
 
 <Route path="reset-password" element={<ResetPassword/>} />
 
@@ -59,6 +59,16 @@ function App() {
               </PrivateRoute>
             }
           />
+
+    <Route
+            path="/AI"
+            element={
+              <PrivateRoute user={user}>
+                <AI/>
+              </PrivateRoute>
+            }
+          />
+
 
           <Route
             path="/post-blog"
