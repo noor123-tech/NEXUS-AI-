@@ -15,6 +15,8 @@ import re
 from dotenv import load_dotenv
 import google.generativeai as genai
 from fastapi import Form
+from textblob import TextBlob  # for simple sentiment analysis
+
 
 # imports end here
 from email_utils import send_email
@@ -396,28 +398,43 @@ def seems_like_a_blog(text: str) -> bool:
     # A simple check: treat it as a blog if it has at least 50 words
     return len(text.split()) > 50
 
+
+def get_sentiment(text: str) -> str:
+    analysis = TextBlob(text)
+    polarity = analysis.sentiment.polarity
+    if polarity > 0.2:
+        return "Positive 😊"
+    elif polarity < -0.2:
+        return "Negative 😞"
+    else:
+        return "Neutral 😐"
+
+
 @app.post("/api/chat")
 async def chat_api(message: str = Form(...)):
     try:
         msg_lower = message.lower().strip()
 
-        # Friendly replies
         if msg_lower in friendly_gestures:
             return JSONResponse(content={"response": "Hello! I'm here to help you with blogs. 😊"})
 
-        # Check if it's a blog-related request
         if is_blog_related(msg_lower):
-            # If it's a review request, check for actual blog content
             if "review" in msg_lower or "check" in msg_lower or "is this blog" in msg_lower:
                 if not seems_like_a_blog(message):
                     return JSONResponse(content={"response": "❗ It seems you haven't provided a full blog. Please paste your blog so I can review it."})
-            # Allow writing/reviewing the blog
+
             model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(message)
             formatted_response = format_response(response.text)
-            return JSONResponse(content={"response": formatted_response})
 
-        # Reject all other types of input
+            # Add sentiment analysis
+            sentiment_result = get_sentiment(message)
+            final_response = f"{formatted_response}\n\nSentiment: {sentiment_result}"
+
+            return JSONResponse(content={
+                "response": final_response
+            })
+
         return JSONResponse(content={"response": "❗ I'm here to help only with blog writing and reviewing. Please ask me to write or check a blog."})
 
     except Exception as e:

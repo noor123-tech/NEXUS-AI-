@@ -4,12 +4,19 @@ import Hero from '../components/Hero';
 const AI = () => {
   const [userMessage, setUserMessage] = useState('');
   const [aiResponse, setAiResponse] = useState('');
-  const [loading, setLoading] = useState(false); // NEW
+  const [loading, setLoading] = useState(false);
+  const [sentiment, setSentiment] = useState(null); // NEW
+
+  const extractSentiment = (text) => {
+    const match = text.match(/Sentiment:\s*(\w+)/i);
+    return match ? match[1] : null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Show loader
-    setAiResponse(''); // Clear old response
+    setLoading(true);
+    setAiResponse('');
+    setSentiment(null); // Reset sentiment
 
     const formData = new FormData();
     formData.append("message", userMessage);
@@ -21,12 +28,18 @@ const AI = () => {
       });
 
       const data = await response.json();
-      setAiResponse(data.response || data.error || 'No response');
+      const finalResponse = data.response || data.error || 'No response';
+      setAiResponse(finalResponse);
+
+      const extracted = extractSentiment(finalResponse);
+      if (extracted) {
+        setSentiment(extracted);
+      }
     } catch (error) {
       console.error("Fetch error:", error);
       setAiResponse("Failed to fetch response.");
     } finally {
-      setLoading(false); // Hide loader
+      setLoading(false);
     }
   };
 
@@ -56,13 +69,22 @@ const AI = () => {
         </div>
       )}
 
-      {/* AI Response */}
+      {/* AI Response and Sentiment */}
       {!loading && aiResponse && (
-        <div className="max-w-3xl mx-auto mt-10 bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-2">NexusAI Response</h2>
-          <pre className="bg-black/50 p-4 rounded text-green-300 overflow-x-auto whitespace-pre-wrap">
-            {aiResponse}
-          </pre>
+        <div className="max-w-6xl mx-auto mt-10 grid md:grid-cols-4 gap-6 px-4">
+          <div className="md:col-span-3 bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-2">NexusAI Response</h2>
+            <pre className="bg-black/50 p-4 rounded text-green-300 overflow-x-auto whitespace-pre-wrap">
+              {aiResponse}
+            </pre>
+          </div>
+
+          {sentiment && (
+            <div className="bg-gray-900 p-6 rounded-xl shadow-lg border border-purple-500">
+              <h3 className="text-lg font-bold text-purple-400 mb-3">Sentiment Analysis</h3>
+              <p className="text-white text-xl font-semibold">{sentiment}</p>
+            </div>
+          )}
         </div>
       )}
 
